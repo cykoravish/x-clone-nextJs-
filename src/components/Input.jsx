@@ -10,14 +10,24 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlinePhotograph } from "react-icons/hi";
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+} from "firebase/firestore";
 
 export default function Input() {
   const { data: session } = useSession();
   const imagePickRef = useRef(null);
+  const db = getFirestore(app);
 
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [text, setText] = useState("");
+  const [postLoading, setPostLoading] = useState(false);
 
   const addImageToPost = (e) => {
     const file = e.target.files[0];
@@ -61,6 +71,23 @@ export default function Input() {
     );
   };
 
+  const handleSubmit = async () => {
+    setPostLoading(true);
+    const docRef = await addDoc(collection(db, "posts"), {
+      uid: session.user.uid,
+      name: session.user.name,
+      username: session.user.username,
+      profileImage: imageFileUrl,
+      text,
+      Timestamp: serverTimestamp(),
+      image: imageFileUrl,
+    });
+    setPostLoading(false);
+    setText("");
+    setImageFileUrl(null);
+    setSelectedFile(null);
+  };
+
   if (!session) return null;
   return (
     <div className="flex border-b border-gray-200 p-3 space-x-3 w-full">
@@ -74,12 +101,16 @@ export default function Input() {
           className="w-full border-none outline-none tracking-wide min-h-[50px] text-gray-700"
           placeholder="Whats happening"
           rows="2"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
         ></textarea>
         {selectedFile && (
           <img
             src={imageFileUrl}
             alt="image"
-            className="w-full max-h-[250px] object-cover cursor-pointer"
+            className={`w-full max-h-[250px] object-cover cursor-pointer ${
+              imageFileUploading ? "animate-plus" : ""
+            }`}
           />
         )}
         <div className="flex items-center justify-between pt-2.5">
@@ -94,7 +125,11 @@ export default function Input() {
             onChange={addImageToPost}
             hidden
           />
-          <button className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50">
+          <button
+            disabled={text.trim() === "" || postLoading || imageFileUploading}
+            className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+            onClick={handleSubmit}
+          >
             Post
           </button>
         </div>
