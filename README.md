@@ -1,3 +1,26 @@
+# Twitter Clone
+
+Welcome to full stack project with next js
+
+## Project
+
+![Project Screenshot](./public/project.png)
+
+- It's a full stack project made with nextJS.
+
+## Technologies Used
+
+List the technologies and tools i've used in your project.
+
+- NEXT JS
+- TAILWIND CSS
+- FIREBASE
+
+## Contributing
+
+If you would like to contribute, feel free to submit issues or pull requests. I appreciate any feedback or collaboration!
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
